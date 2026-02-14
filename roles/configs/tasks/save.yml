@@ -1,0 +1,102 @@
+---
+- name: Ensure files directory exists
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/files"
+    state: directory
+  delegate_to: localhost
+
+- name: Save configs from system into repo
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: pull
+    delete: true
+    rsync_opts: >-
+      {{ ((['--include=*/', '-m'] + (item.includes | map('regex_replace', '^(.*)$', '--include=\1') | list) + ['--exclude=*']) | map('quote') | list)
+         if item.includes is defined
+         else (((item.excludes | map('regex_replace', '^(.*)$', '--exclude=\1') | list) | map('quote') | list)
+         if item.excludes is defined
+         else []) }}
+  loop: "{{ config_entries | rejectattr('is_file', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.src is exists
+  delegate_to: localhost
+
+- name: Save file configs from system into repo
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: preserve
+  loop: "{{ config_entries | selectattr('is_file', 'defined') | selectattr('is_file') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.src is exists
+
+# Strip PII from saved floorp prefs.js files
+- name: Find saved floorp prefs.js files
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/files/floorp"
+    patterns: "prefs.js"
+    recurse: true
+  register: floorp_prefs_files
+  delegate_to: localhost
+
+- name: Strip sensitive prefs from floorp prefs.js
+  ansible.builtin.lineinfile:
+    path: "{{ item.0.path }}"
+    regexp: "{{ item.1 }}"
+    state: absent
+  loop: "{{ floorp_prefs_files.files | product(floorp_sensitive_pref_patterns) | list }}"
+  loop_control:
+    label: "{{ item.0.path | basename }} - {{ item.1 }}"
+  delegate_to: localhost
+  when: floorp_prefs_files.files | length > 0
+  vars:
+    floorp_sensitive_pref_patterns:
+      - '^user_pref\("services\.sync\.'
+      - '^user_pref\("identity\.fxaccounts\.'
+      - '^user_pref\("toolkit\.telemetry\.'
+      - '^user_pref\("datareporting\.'
+      - '^user_pref\("extensions\.webextensions\.uuids'
+      - '^user_pref\("browser\.newtabpage\.activity-stream\.impressionId'
+      - '^user_pref\("dom\.push\.userAgentID'
+      - '^user_pref\("floorp\.experiments\.installId'
+      - '^user_pref\("floorp\.experiments\.assignments'
+      - '^user_pref\("nimbus\.profileId'
+
+# Remove extension storage for sensitive extensions (e.g. password managers)
+- name: Remove excluded extension storage from saved floorp data
+  ansible.builtin.shell:
+    cmd: |
+      python3 -c '
+      import json, glob, shutil, os
+      excluded = json.loads(os.environ["EXCLUDED"])
+      for prefs in glob.glob(os.environ["FLOORP_HOME"] + "/*/prefs.js"):
+          with open(prefs) as f:
+              for line in f:
+                  if "webextensions.uuids" not in line:
+                      continue
+                  start = line.index(", \"") + 3
+                  end = line.rindex("\"")
+                  raw = line[start:end].replace("\\\"", "\"")
+                  mapping = json.loads(raw)
+                  for ext_id in excluded:
+                      uuid = mapping.get(ext_id)
+                      if not uuid:
+                          continue
+                      for d in glob.glob(os.environ["SAVE_DIR"] + "/*/storage/default/moz-extension+++" + uuid + "*"):
+                          shutil.rmtree(d)
+                          print("Removed: " + d)
+                  break
+      '
+  environment:
+    EXCLUDED: "{{ floorp_excluded_extensions | to_json }}"
+    FLOORP_HOME: "{{ local_home }}/.floorp"
+    SAVE_DIR: "{{ playbook_dir }}/files/floorp"
+  register: floorp_storage_cleanup
+  changed_when: "'Removed:' in floorp_storage_cleanup.stdout"
+  delegate_to: localhost
+  vars:
+    floorp_excluded_extensions:
+      - "{% raw %}{446900e4-71c2-419f-a6a7-df9c091e268b}{% endraw %}"

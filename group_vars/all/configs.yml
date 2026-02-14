@@ -1,0 +1,98 @@
+---
+config_entries:
+  - name: cosmic
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/cosmic/"
+    dest: "{{ playbook_dir }}/files/cosmic/"
+    includes:
+      - "**"
+
+  - name: cosmic-dconf
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/dconf/cosmic"
+    dest: "{{ playbook_dir }}/files/cosmic-dconf"
+    is_file: true
+
+  - name: fish
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/fish/"
+    dest: "{{ playbook_dir }}/files/fish/"
+    includes:
+      - config.fish
+      - completions/***
+      - conf.d/***
+      - functions/***
+
+  - name: vesktop
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/vesktop/"
+    dest: "{{ playbook_dir }}/files/vesktop/"
+    includes:
+      - settings/
+      - settings/**
+      - settings.json
+      - themes/
+      - themes/**
+
+  - name: vesktop-flags
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/vesktop-flags.conf"
+    dest: "{{ playbook_dir }}/files/vesktop-flags.conf"
+    is_file: true
+
+  - name: floorp
+    src: "{{ ansible_facts['env']['HOME'] }}/.floorp/"
+    dest: "{{ playbook_dir }}/files/floorp/"
+    includes:
+      - profiles.ini
+      - installs.ini
+      - "*/prefs.js"
+      - "*/chrome/***"
+      - "*/extensions/***"
+      - "*/extensions.json"
+      - "*/extension-settings.json"
+      - "*/extension-preferences.json"
+      - "*/addons.json"
+      - "*/addonStartup.json.lz4"
+      - "*/search.json.mozlz4"
+      - "*/handlers.json"
+      - "*/ssb/***"
+      - "*/containers.json"
+      - "*/storage/default/moz-extension+++*/***"
+
+  - name: pipewire
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/pipewire/"
+    dest: "{{ playbook_dir }}/files/pipewire/"
+    includes:
+      - "**"
+
+  - name: gtk3
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/gtk-3.0/"
+    dest: "{{ playbook_dir }}/files/gtk-3.0/"
+    includes:
+      - "**"
+
+  - name: jetbrains-config
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/JetBrains/"
+    dest: "{{ playbook_dir }}/files/jetbrains-config/"
+    includes:
+      - "*/options/colors.scheme.xml"
+      - "*/options/console-font.xml"
+      - "*/options/editor-font.xml"
+      - "*/options/filetypes.xml"
+      - "*/options/ide.general.xml"
+      - "*/options/laf.xml"
+      - "*/options/textmate.xml"
+      - "*/options/window.layouts.xml"
+
+  - name: jetbrains-data
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/share/JetBrains/"
+    dest: "{{ playbook_dir }}/files/jetbrains-data/"
+    includes:
+      - "*/Catppuccin Theme/***"
+
+  - name: wallpapers
+    src: "{{ ansible_facts['env']['HOME'] }}/Pictures/wallpapers/"
+    dest: "{{ playbook_dir }}/files/wallpapers/"
+    includes:
+      - "**"
+
+  - name: mimeapps
+    src: "{{ ansible_facts['env']['HOME'] }}/.config/mimeapps.list"
+    dest: "{{ playbook_dir }}/files/mimeapps.list"
+    is_file: true

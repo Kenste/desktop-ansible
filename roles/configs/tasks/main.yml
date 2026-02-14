@@ -1,0 +1,8 @@
+---
+- name: Run config save
+  ansible.builtin.include_tasks: save.yml
+  when: config_mode | default('restore') == 'save'
+
+- name: Run config restore
+  ansible.builtin.include_tasks: restore.yml
+  when: config_mode | default('restore') == 'restore'
