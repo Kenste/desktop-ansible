@@ -1,0 +1,3 @@
+---
+- name: Include distro-specific package tasks
+  ansible.builtin.include_tasks: "{{ distro_family }}.yml"

@@ -1,0 +1,97 @@
+---
+# Resolve profile to active package groups
+- name: Set active package groups
+  ansible.builtin.set_fact:
+    active_groups: "{{ package_profiles[package_profile] }}"
+
+- name: Display active profile
+  ansible.builtin.debug:
+    msg: "Profile '{{ package_profile }}': {{ active_groups | join(', ') }}"
+
+# Build flat lists of repo and AUR packages from active groups only
+- name: Build repo package list
+  ansible.builtin.set_fact:
+    repo_packages: >-
+      {{ active_groups | map('extract', package_groups) | flatten
+         | selectattr('arch', 'defined') | map(attribute='arch')
+         | selectattr('repo', 'defined') | map(attribute='repo') | flatten | unique | list }}
+
+- name: Build AUR package list
+  ansible.builtin.set_fact:
+    aur_packages: >-
+      {{ active_groups | map('extract', package_groups) | flatten
+         | selectattr('arch', 'defined') | map(attribute='arch')
+         | selectattr('aur', 'defined') | map(attribute='aur') | flatten | unique | list }}
+
+- name: Display packages to install
+  ansible.builtin.debug:
+    msg: |
+      Repo packages ({{ repo_packages | length }}): {{ repo_packages | join(', ') }}
+      AUR packages ({{ aur_packages | length }}): {{ aur_packages | join(', ') }}
+
+# Install official repo packages
+- name: Install official repo packages
+  community.general.pacman:
+    name: "{{ repo_packages }}"
+    state: present
+    update_cache: true
+  become: true
+  when: repo_packages | length > 0
+
+# Bootstrap AUR helper if needed
+- name: Bootstrap paru if no AUR helper available
+  when: aur_helper == 'none' and aur_packages | length > 0
+  block:
+    - name: Install base-devel for building AUR packages
+      community.general.pacman:
+        name: base-devel
+        state: present
+      become: true
+
+    - name: Clone paru-bin
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/paru-bin.git
+        dest: "{{ local_home }}/.cache/ansible-paru-build"
+        version: master
+        force: true
+
+    - name: Build and install paru-bin
+      ansible.builtin.command:
+        cmd: makepkg -si --noconfirm
+        chdir: "{{ local_home }}/.cache/ansible-paru-build"
+      changed_when: true
+
+    - name: Clean up paru-bin build dir
+      ansible.builtin.file:
+        path: "{{ local_home }}/.cache/ansible-paru-build"
+        state: absent
+
+    - name: Update AUR helper fact
+      ansible.builtin.set_fact:
+        aur_helper: paru
+
+# Install AUR packages (paru calls sudo internally, so we temporarily allow passwordless pacman)
+- name: Install AUR packages with temporary sudoers rule
+  when: aur_packages | length > 0
+  block:
+    - name: Allow passwordless pacman for AUR helper
+      ansible.builtin.copy:
+        content: "{{ local_user }} ALL=(ALL) NOPASSWD: /usr/bin/pacman"
+        dest: /etc/sudoers.d/99-ansible-aur
+        mode: "0440"
+        validate: "visudo -cf %s"
+      become: true
+
+    - name: Install AUR packages
+      ansible.builtin.command:
+        cmd: "{{ aur_helper }} -S --needed --noconfirm {{ item }}"
+      loop: "{{ aur_packages }}"
+      register: aur_result
+      changed_when: "'installing' in aur_result.stdout or 'reinstalling' in aur_result.stdout"
+
+  always:
+    - name: Remove temporary sudoers rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/99-ansible-aur
+        state: absent
+      become: true

@@ -1,0 +1,9 @@
+---
+# TODO: Implement Fedora package installation
+# - Use ansible.builtin.dnf for repo packages
+# - Use community.general.flatpak for flatpak packages
+# - Add COPR repos as needed
+
+- name: Fedora package installation
+  ansible.builtin.debug:
+    msg: "Fedora package installation not yet implemented. Add dnf/flatpak tasks here."

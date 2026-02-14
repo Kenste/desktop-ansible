@@ -1,0 +1,23 @@
+---
+# Package profiles - which package groups to install per machine type
+package_profiles:
+  full: [ desktop, browser, chat, voip, gaming, development, shell ]
+  laptop: [ desktop, browser, chat, development, shell ]
+  minimal: [ desktop, shell ]
+
+# Default profile (overridden via bootstrap.sh or --extra-vars)
+package_profile: full
+
+# Default shell
+preferred_shell: /bin/fish
+
+# Systemd system services to enable
+enabled_system_services:
+  - NetworkManager
+  - bluetooth
+
+# Systemd user socket units (pipewire is socket-activated, not service-enabled)
+enabled_user_sockets:
+  - pipewire.socket
+  - pipewire-pulse.socket
+  - wireplumber.service

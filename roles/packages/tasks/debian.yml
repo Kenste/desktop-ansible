@@ -1,0 +1,9 @@
+---
+# TODO: Implement Debian package installation
+# - Use ansible.builtin.apt for repo packages
+# - Use ansible.builtin.apt_repository for PPAs
+# - Use community.general.flatpak for flatpak packages
+
+- name: Debian package installation
+  ansible.builtin.debug:
+    msg: "Debian package installation not yet implemented. Add apt/flatpak tasks here."
