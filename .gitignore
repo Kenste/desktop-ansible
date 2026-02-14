@@ -1,0 +1,30 @@
+# Ansible
+*.retry
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Sensitive data
+*.vault
+vault_pass.txt
+
+# Large binary caches that may sneak into files/
+files/floorp/**/cache2/
+files/floorp/**/storage/permanent/
+files/floorp/**/storage/temporary/
+files/floorp/**/storage/default/http*/
+files/floorp/**/storage/default/https*/
+files/vesktop/**/sessionData/
+files/vesktop/**/Crashpad/
+files/steam-config/**/htmlcache/
+files/steam-config/**/avatarcache/
+files/teamspeak/**/cache/
+files/teamspeak/**/crashdumps/
