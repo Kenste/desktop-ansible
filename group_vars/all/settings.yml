@@ -15,6 +15,7 @@ preferred_shell: /bin/fish
 enabled_system_services:
   - NetworkManager
   - bluetooth
+  - cosmic-greeter
 
 # Systemd user socket units (pipewire is socket-activated, not service-enabled)
 enabled_user_sockets:
