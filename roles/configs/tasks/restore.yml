@@ -8,6 +8,15 @@
     label: "{{ item.name }}"
   when: item.dest is exists
 
+- name: Ensure destination directories exist for directory configs
+  ansible.builtin.file:
+    path: "{{ item.src }}"
+    state: directory
+  loop: "{{ config_entries | rejectattr('is_file', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.dest is exists
+
 - name: Restore configs from repo onto system
   ansible.posix.synchronize:
     src: "{{ item.dest }}"
