@@ -1,0 +1,55 @@
+---
+- name: Gather OS facts
+  ansible.builtin.setup:
+    gather_subset:
+      - distribution
+      - env
+
+- name: Set distro family
+  ansible.builtin.set_fact:
+    distro_family: >-
+      {{ 'arch' if ansible_facts['os_family'] == 'Archlinux'
+         else 'fedora' if ansible_facts['os_family'] == 'RedHat'
+         else 'debian' if ansible_facts['os_family'] == 'Debian'
+         else 'unknown' }}
+
+- name: Fail on unsupported distro
+  ansible.builtin.fail:
+    msg: "Unsupported distro family '{{ ansible_facts['os_family'] }}'. Supported: Archlinux, RedHat, Debian."
+  when: distro_family == 'unknown'
+
+- name: Set local user info
+  ansible.builtin.set_fact:
+    local_user: "{{ ansible_facts['env']['USER'] }}"
+    local_home: "{{ ansible_facts['env']['HOME'] }}"
+
+- name: Detect AUR helper
+  when: distro_family == 'arch'
+  block:
+    - name: Check for paru
+      ansible.builtin.command: which paru
+      register: paru_check
+      changed_when: false
+      failed_when: false
+
+    - name: Check for yay
+      ansible.builtin.command: which yay
+      register: yay_check
+      changed_when: false
+      failed_when: false
+
+    - name: Set AUR helper fact
+      ansible.builtin.set_fact:
+        aur_helper: >-
+          {{ 'paru' if paru_check.rc == 0
+             else 'yay' if yay_check.rc == 0
+             else 'none' }}
+
+- name: Display detected environment
+  ansible.builtin.debug:
+    msg: |
+      Distribution: {{ ansible_facts['distribution'] }}
+      Distro family: {{ distro_family }}
+      User: {{ local_user }}
+      Home: {{ local_home }}
+      AUR helper: {{ aur_helper | default('N/A') }}
