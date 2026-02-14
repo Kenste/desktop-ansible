@@ -1,0 +1,23 @@
+---
+- name: Check if COSMIC session is available
+  ansible.builtin.stat:
+    path: /usr/share/wayland-sessions/cosmic.desktop
+  register: cosmic_session
+
+- name: Report COSMIC status
+  ansible.builtin.debug:
+    msg: >-
+      {% if cosmic_session.stat.exists %}COSMIC session file found - desktop is ready.
+      {% else %}WARNING: COSMIC session file not found at /usr/share/wayland-sessions/cosmic.desktop. COSMIC may not be fully installed.{% endif %}
+
+- name: Verify cosmic-comp is available
+  ansible.builtin.command: which cosmic-comp
+  register: cosmic_comp_check
+  changed_when: false
+  failed_when: false
+
+- name: Report cosmic-comp status
+  ansible.builtin.debug:
+    msg: >-
+      {% if cosmic_comp_check.rc == 0 %}cosmic-comp found at {{ cosmic_comp_check.stdout }}.
+      {% else %}WARNING: cosmic-comp not found in PATH. COSMIC compositor may not be installed.{% endif %}

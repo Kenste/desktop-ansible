@@ -1,0 +1,13 @@
+---
+- name: Ensure fish is in /etc/shells
+  ansible.builtin.lineinfile:
+    path: /etc/shells
+    line: "{{ preferred_shell }}"
+    state: present
+  become: true
+
+- name: Set fish as default shell for {{ local_user }}
+  ansible.builtin.user:
+    name: "{{ local_user }}"
+    shell: "{{ preferred_shell }}"
+  become: true

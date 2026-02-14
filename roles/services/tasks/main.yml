@@ -1,0 +1,16 @@
+---
+- name: Enable system services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ enabled_system_services }}"
+  become: true
+
+- name: Enable user socket/service units (pipewire stack)
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    scope: user
+    daemon_reload: true
+  loop: "{{ enabled_user_sockets }}"
