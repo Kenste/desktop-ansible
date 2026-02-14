@@ -1,0 +1,5 @@
+(
+    save_location: Clipboard,
+    choice: Window,
+    last_rectangle: None,
+)
