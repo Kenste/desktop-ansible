@@ -1,0 +1,16 @@
+---
+- name: Save current configs into repo
+  hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Set config mode to save
+      ansible.builtin.set_fact:
+        config_mode: save
+
+  roles:
+    - role: detect
+      tags: [ always ]
+
+    - role: configs
+      tags: [ configs ]

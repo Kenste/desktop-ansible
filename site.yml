@@ -1,0 +1,28 @@
+---
+- name: Desktop system deployment
+  hosts: localhost
+  connection: local
+
+  pre_tasks:
+    - name: Set config mode to restore
+      ansible.builtin.set_fact:
+        config_mode: restore
+
+  roles:
+    - role: detect
+      tags: [ always ]
+
+    - role: packages
+      tags: [ packages ]
+
+    - role: shell
+      tags: [ shell ]
+
+    - role: services
+      tags: [ services ]
+
+    - role: desktop
+      tags: [ desktop ]
+
+    - role: configs
+      tags: [ configs ]
