@@ -3,7 +3,6 @@
   ansible.builtin.file:
     path: "{{ playbook_dir }}/files"
     state: directory
-  delegate_to: localhost
 
 - name: Save configs from system into repo
   ansible.posix.synchronize:
@@ -40,7 +39,6 @@
     patterns: "prefs.js"
     recurse: true
   register: floorp_prefs_files
-  delegate_to: localhost
 
 - name: Strip sensitive prefs from floorp prefs.js
   ansible.builtin.lineinfile:
@@ -50,7 +48,6 @@
   loop: "{{ floorp_prefs_files.files | product(floorp_sensitive_pref_patterns) | list }}"
   loop_control:
     label: "{{ item.0.path | basename }} - {{ item.1 }}"
-  delegate_to: localhost
   when: floorp_prefs_files.files | length > 0
   vars:
     floorp_sensitive_pref_patterns:
@@ -96,7 +93,6 @@
     SAVE_DIR: "{{ playbook_dir }}/files/floorp"
   register: floorp_storage_cleanup
   changed_when: "'Removed:' in floorp_storage_cleanup.stdout"
-  delegate_to: localhost
   vars:
     floorp_excluded_extensions:
       - "{% raw %}{446900e4-71c2-419f-a6a7-df9c091e268b}{% endraw %}"
@@ -110,7 +106,6 @@
     recurse: true
     file_type: file
   register: cosmic_wallpaper_files
-  delegate_to: localhost
 
 - name: Replace home path with @@HOME@@ in COSMIC wallpaper configs
   ansible.builtin.replace:
@@ -120,7 +115,6 @@
   loop: "{{ cosmic_wallpaper_files.files }}"
   loop_control:
     label: "{{ item.path | relpath(playbook_dir) }}"
-  delegate_to: localhost
   when: cosmic_wallpaper_files.files | length > 0
 
 - name: Find saved Floorp SSB desktop files
@@ -128,7 +122,6 @@
     paths: "{{ playbook_dir }}/files/floorp-ssb-desktop"
     patterns: "floorp-*.desktop"
   register: floorp_ssb_desktop_files
-  delegate_to: localhost
 
 - name: Replace home path with @@HOME@@ in Floorp SSB desktop files
   ansible.builtin.replace:
@@ -138,5 +131,4 @@
   loop: "{{ floorp_ssb_desktop_files.files }}"
   loop_control:
     label: "{{ item.path | basename }}"
-  delegate_to: localhost
   when: floorp_ssb_desktop_files.files | length > 0

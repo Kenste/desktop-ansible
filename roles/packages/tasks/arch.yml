@@ -81,7 +81,7 @@
         validate: "visudo -cf %s"
       become: true
 
-    - name: Install AUR packages
+    - name: Install AUR packages with {{ aur_helper }}
       ansible.builtin.command:
         cmd: "{{ aur_helper }} -S --needed --noconfirm {{ item }}"
       loop: "{{ aur_packages }}"

@@ -55,4 +55,4 @@ package_groups:
 
   shell:
     - name: fish
-      arch: { repo: [ fish ] }
+      arch: { repo: [ fish, fastfetch, eza, bat ] }
