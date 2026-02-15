@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=YouTube
+Comment=YouTube
+Exec=/usr/lib/floorp/floorp --name floorp-61c70286-fe40-408d-a76f-695dae537da9 --profile @@HOME@@/.floorp/79fbwj8n.default-default --start-ssb "{61c70286-fe40-408d-a76f-695dae537da9}"
+Icon=@@HOME@@/.local/share/icons/hicolor/512x512/apps/floorp-61c70286-fe40-408d-a76f-695dae537da9.png
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=floorp-61c70286-fe40-408d-a76f-695dae537da9
+X-MultipleArgs=false
+X-Floorp-StartUrl=https://www.youtube.com/?feature=ytca
+X-Floorp-Id={61c70286-fe40-408d-a76f-695dae537da9}
