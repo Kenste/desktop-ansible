@@ -3,7 +3,6 @@
   ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
-    state: started
   loop: "{{ enabled_system_services }}"
   become: true
 

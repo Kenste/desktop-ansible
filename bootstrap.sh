@@ -112,4 +112,8 @@ case "$MODE" in
         ;;
 esac
 
-info "Done!"
+if [[ "$MODE" == "deploy" ]]; then
+    info "Done! Reboot the system to apply all changes."
+else
+    info "Done!"
+fi
