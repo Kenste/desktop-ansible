@@ -78,6 +78,7 @@ config_entries:
       - "*/options/ide.general.xml"
       - "*/options/laf.xml"
       - "*/options/textmate.xml"
+      - "*/options/other.xml"
       - "*/options/window.layouts.xml"
 
   - name: jetbrains-data
@@ -91,6 +92,19 @@ config_entries:
     dest: "{{ playbook_dir }}/files/wallpapers/"
     includes:
       - "**"
+
+  - name: floorp-ssb-desktop
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/share/applications/"
+    dest: "{{ playbook_dir }}/files/floorp-ssb-desktop/"
+    includes:
+      - "floorp-*.desktop"
+
+  - name: floorp-ssb-icons
+    src: "{{ ansible_facts['env']['HOME'] }}/.local/share/icons/hicolor/"
+    dest: "{{ playbook_dir }}/files/floorp-ssb-icons/"
+    includes:
+      - "*/apps/floorp-*.svg"
+      - "*/apps/floorp-*.png"
 
   - name: mimeapps
     src: "{{ ansible_facts['env']['HOME'] }}/.config/mimeapps.list"

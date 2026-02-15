@@ -58,7 +58,6 @@
       - '^user_pref\("identity\.fxaccounts\.'
       - '^user_pref\("toolkit\.telemetry\.'
       - '^user_pref\("datareporting\.'
-      - '^user_pref\("extensions\.webextensions\.uuids'
       - '^user_pref\("browser\.newtabpage\.activity-stream\.impressionId'
       - '^user_pref\("dom\.push\.userAgentID'
       - '^user_pref\("floorp\.experiments\.installId'
@@ -100,3 +99,43 @@
   vars:
     floorp_excluded_extensions:
       - "{% raw %}{446900e4-71c2-419f-a6a7-df9c091e268b}{% endraw %}"
+
+# Replace hardcoded home paths with @@HOME@@ placeholder in saved files
+- name: Find saved COSMIC wallpaper config files
+  ansible.builtin.find:
+    paths:
+      - "{{ playbook_dir }}/files/cosmic/com.system76.CosmicBackground"
+      - "{{ playbook_dir }}/files/cosmic/com.system76.CosmicSettings.Wallpaper"
+    recurse: true
+    file_type: file
+  register: cosmic_wallpaper_files
+  delegate_to: localhost
+
+- name: Replace home path with @@HOME@@ in COSMIC wallpaper configs
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: "{{ local_home | regex_escape }}"
+    replace: "@@HOME@@"
+  loop: "{{ cosmic_wallpaper_files.files }}"
+  loop_control:
+    label: "{{ item.path | relpath(playbook_dir) }}"
+  delegate_to: localhost
+  when: cosmic_wallpaper_files.files | length > 0
+
+- name: Find saved Floorp SSB desktop files
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/files/floorp-ssb-desktop"
+    patterns: "floorp-*.desktop"
+  register: floorp_ssb_desktop_files
+  delegate_to: localhost
+
+- name: Replace home path with @@HOME@@ in Floorp SSB desktop files
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: "{{ local_home | regex_escape }}"
+    replace: "@@HOME@@"
+  loop: "{{ floorp_ssb_desktop_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  delegate_to: localhost
+  when: floorp_ssb_desktop_files.files | length > 0

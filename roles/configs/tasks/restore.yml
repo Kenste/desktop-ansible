@@ -35,6 +35,42 @@
   when: item.dest is exists
   delegate_to: localhost
 
+# Replace @@HOME@@ placeholder with actual home path in restored files
+- name: Find restored COSMIC wallpaper config files
+  ansible.builtin.find:
+    paths:
+      - "{{ ansible_facts['env']['HOME'] }}/.config/cosmic/com.system76.CosmicBackground"
+      - "{{ ansible_facts['env']['HOME'] }}/.config/cosmic/com.system76.CosmicSettings.Wallpaper"
+    recurse: true
+    file_type: file
+  register: cosmic_wallpaper_files
+
+- name: Replace @@HOME@@ with actual home path in COSMIC wallpaper configs
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: "@@HOME@@"
+    replace: "{{ ansible_facts['env']['HOME'] }}"
+  loop: "{{ cosmic_wallpaper_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: cosmic_wallpaper_files.files | length > 0
+
+- name: Find restored Floorp SSB desktop files
+  ansible.builtin.find:
+    paths: "{{ ansible_facts['env']['HOME'] }}/.local/share/applications"
+    patterns: "floorp-*.desktop"
+  register: floorp_ssb_desktop_files
+
+- name: Replace @@HOME@@ with actual home path in Floorp SSB desktop files
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: "@@HOME@@"
+    replace: "{{ ansible_facts['env']['HOME'] }}"
+  loop: "{{ floorp_ssb_desktop_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: floorp_ssb_desktop_files.files | length > 0
+
 - name: Restore file configs from repo onto system
   ansible.builtin.copy:
     src: "{{ item.dest }}"
