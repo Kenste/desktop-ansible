@@ -45,6 +45,15 @@
     upgrade: true
   become: true
 
+# Ensure playbook dependencies are installed
+- name: Install playbook dependencies
+  community.general.pacman:
+    name:
+      - rsync
+      - git
+    state: present
+  become: true
+
 # Install official repo packages
 - name: Install official repo packages
   community.general.pacman:
