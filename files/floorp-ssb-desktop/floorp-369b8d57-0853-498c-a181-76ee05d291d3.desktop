@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Claude
+Comment=Claude
+Exec=/usr/lib/floorp/floorp --name floorp-369b8d57-0853-498c-a181-76ee05d291d3 --profile @@HOME@@/.floorp/79fbwj8n.default-default --start-ssb "{369b8d57-0853-498c-a181-76ee05d291d3}"
+Icon=@@HOME@@/.local/share/icons/hicolor/512x512/apps/floorp-369b8d57-0853-498c-a181-76ee05d291d3.svg
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=floorp-369b8d57-0853-498c-a181-76ee05d291d3
+X-MultipleArgs=false
+X-Floorp-StartUrl=https://claude.ai/new
+X-Floorp-Id={369b8d57-0853-498c-a181-76ee05d291d3}

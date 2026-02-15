@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Gemini
+Comment=Gemini
+Exec=/usr/lib/floorp/floorp --name floorp-7df0b55b-551f-485d-a8fb-726d74f23ae3 --profile @@HOME@@/.floorp/79fbwj8n.default-default --start-ssb "{7df0b55b-551f-485d-a8fb-726d74f23ae3}"
+Icon=@@HOME@@/.local/share/icons/hicolor/512x512/apps/floorp-7df0b55b-551f-485d-a8fb-726d74f23ae3.svg
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=floorp-7df0b55b-551f-485d-a8fb-726d74f23ae3
+X-MultipleArgs=false
+X-Floorp-StartUrl=https://gemini.google.com/app
+X-Floorp-Id={7df0b55b-551f-485d-a8fb-726d74f23ae3}

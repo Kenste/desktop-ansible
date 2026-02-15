@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Qobuz
+Comment=Qobuz
+Exec=/usr/lib/floorp/floorp --name floorp-d6ecda66-a6a1-426e-acc3-3022b8314d12 --profile @@HOME@@/.floorp/79fbwj8n.default-default --start-ssb "{d6ecda66-a6a1-426e-acc3-3022b8314d12}"
+Icon=@@HOME@@/.local/share/icons/hicolor/512x512/apps/floorp-d6ecda66-a6a1-426e-acc3-3022b8314d12.png
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=floorp-d6ecda66-a6a1-426e-acc3-3022b8314d12
+X-MultipleArgs=false
+X-Floorp-StartUrl=https://play.qobuz.com/discover
+X-Floorp-Id={d6ecda66-a6a1-426e-acc3-3022b8314d12}
