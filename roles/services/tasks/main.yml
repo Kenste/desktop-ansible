@@ -5,6 +5,8 @@
     enabled: true
   loop: "{{ enabled_system_services }}"
   become: true
+  register: service_result
+  failed_when: service_result is failed and 'Could not find' not in service_result.msg
 
 - name: Enable user socket/service units (pipewire stack)
   ansible.builtin.systemd:
