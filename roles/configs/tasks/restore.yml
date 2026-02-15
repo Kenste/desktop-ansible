@@ -52,7 +52,7 @@
     mode: push
     delete: false
     rsync_opts: >-
-      {{ (['--rsync-path=sudo rsync', '--include=*/', '-m'] + (item.includes | map('regex_replace', '^(.*)$', '--include=\1') | list) + ['--exclude=*']) | map('quote') | list }}
+      {{ (['--rsync-path=sudo rsync', '--no-owner', '--no-group', '--include=*/', '-m'] + (item.includes | map('regex_replace', '^(.*)$', '--include=\1') | list) + ['--exclude=*']) | map('quote') | list }}
   loop: "{{ config_entries | selectattr('system', 'defined') | selectattr('system') | list }}"
   loop_control:
     label: "{{ item.name }}"
