@@ -45,6 +45,8 @@ package_groups:
   gaming:
     - name: steam
       arch: { repo: [ steam ] }
+    - name: prismlauncher
+      arch: { repo: [ prismlauncher ] }
     - name: faugus-launcher
       arch:
         aur: [ faugus-launcher ]
