@@ -63,6 +63,7 @@
       - '^user_pref\("floorp\.experiments\.installId'
       - '^user_pref\("floorp\.experiments\.assignments'
       - '^user_pref\("nimbus\.profileId'
+      - '^user_pref\("floorp\.workspaces\.v4\.store'
 
 # Remove extension storage for sensitive extensions (e.g. password managers)
 - name: Remove excluded extension storage from saved floorp data
