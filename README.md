@@ -23,6 +23,10 @@ Ansible playbook to replicate my desktop setup across fresh installs. Arch-first
 
 `bootstrap.sh` handles installing Ansible itself if it's not present.
 
+### Prerequisites
+
+- An AUR helper (`paru` or `yay`) must be installed for AUR packages. The playbook will fail with a clear message if none is found.
+
 ### Profiles
 
 | Profile          | Groups                                                   |
@@ -46,16 +50,18 @@ To add a new profile, edit `group_vars/all/settings.yml`.
 | voip        | TeamSpeak 3            | full         |
 | gaming      | Steam, Faugus Launcher | full         |
 | development | IntelliJ IDEA          | full, laptop |
-| shell       | Fish                   | all          |
+| shell       | Fish, fastfetch, eza, bat | all       |
 
 ### Configs
 
-Saves/restores dotfiles and app configs: COSMIC themes, Fish, Floorp profiles, Vesktop, Steam, PipeWire,
-JetBrains/IntelliJ, GTK, mimeapps. Excludes caches, session data, cookies, crash dumps.
+Saves/restores dotfiles and app configs: COSMIC themes, Fish (including CachyOS fish config), Floorp profiles + SSB web apps,
+Vesktop, PipeWire, JetBrains/IntelliJ, GTK, wallpapers, mimeapps. Hardcoded home paths are replaced with `@@HOME@@`
+placeholders on save and resolved on restore, so configs work across different usernames.
 
 ### System
 
-Sets Fish as default shell, enables NetworkManager/bluetooth/pipewire services, verifies COSMIC session is available.
+Sets Fish as default shell, enables NetworkManager/bluetooth/cosmic-greeter/pipewire services (missing services are skipped),
+verifies COSMIC session is available. Services are enabled but not started — a reboot is required after deploy.
 
 ## Common Tasks
 
@@ -86,6 +92,7 @@ config_entries:
 ```
 
 For single files instead of directories, add `is_file: true`.
+For system paths (outside `$HOME`), add `system: true` — these are restored with `become`.
 
 ### Adding Fedora/Debian support
 
@@ -122,7 +129,7 @@ ansible-playbook site.yml --tags services --ask-become-pass
 group_vars/all/
   packages.yml    # what to install (per-distro mappings)
   configs.yml     # what configs to save/restore (paths + excludes)
-  settings.yml    # services, shell preference, AUR helper
+  settings.yml    # services, shell preference, profiles
 
 roles/
   detect/         # figures out distro, user, AUR helper
