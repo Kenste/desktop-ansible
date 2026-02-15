@@ -55,4 +55,4 @@ package_groups:
 
   shell:
     - name: fish
-      arch: { repo: [ fish ], aur: [ cachyos-fish-config ] }
+      arch: { repo: [ fish ] }

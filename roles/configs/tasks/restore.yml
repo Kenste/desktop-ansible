@@ -12,10 +12,20 @@
   ansible.builtin.file:
     path: "{{ item.src }}"
     state: directory
-  loop: "{{ config_entries | rejectattr('is_file', 'defined') | list }}"
+  loop: "{{ config_entries | rejectattr('is_file', 'defined') | rejectattr('system', 'defined') | list }}"
   loop_control:
     label: "{{ item.name }}"
   when: item.dest is exists
+
+- name: Ensure destination directories exist for system configs
+  ansible.builtin.file:
+    path: "{{ item.src }}"
+    state: directory
+  loop: "{{ config_entries | selectattr('system', 'defined') | selectattr('system') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.dest is exists
+  become: true
 
 - name: Restore configs from repo onto system
   ansible.posix.synchronize:
@@ -29,7 +39,21 @@
          else (((['--no-owner', '--no-group'] + (item.excludes | map('regex_replace', '^(.*)$', '--exclude=\1') | list)) | map('quote') | list)
          if item.excludes is defined
          else ['--no-owner', '--no-group']) }}
-  loop: "{{ config_entries | rejectattr('is_file', 'defined') | list }}"
+  loop: "{{ config_entries | rejectattr('is_file', 'defined') | rejectattr('system', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.dest is exists
+  delegate_to: localhost
+
+- name: Restore system configs from repo onto system
+  ansible.posix.synchronize:
+    src: "{{ item.dest }}"
+    dest: "{{ item.src }}"
+    mode: push
+    delete: false
+    rsync_opts: >-
+      {{ (['--rsync-path=sudo rsync', '--include=*/', '-m'] + (item.includes | map('regex_replace', '^(.*)$', '--include=\1') | list) + ['--exclude=*']) | map('quote') | list }}
+  loop: "{{ config_entries | selectattr('system', 'defined') | selectattr('system') | list }}"
   loop_control:
     label: "{{ item.name }}"
   when: item.dest is exists
