@@ -29,50 +29,40 @@
       Repo packages ({{ repo_packages | length }}): {{ repo_packages | join(', ') }}
       AUR packages ({{ aur_packages | length }}): {{ aur_packages | join(', ') }}
 
+# Enable multilib repo (needed for steam, etc.)
+- name: Enable multilib repository
+  ansible.builtin.replace:
+    path: /etc/pacman.conf
+    regexp: '^\#?\[multilib\]\n\#?Include = /etc/pacman\.d/mirrorlist'
+    replace: "[multilib]\nInclude = /etc/pacman.d/mirrorlist"
+  become: true
+  when: "'steam' in repo_packages"
+
+# Full system upgrade first to avoid partial upgrade issues
+- name: Update system
+  community.general.pacman:
+    update_cache: true
+    upgrade: true
+  become: true
+
 # Install official repo packages
 - name: Install official repo packages
   community.general.pacman:
     name: "{{ repo_packages }}"
     state: present
-    update_cache: true
   become: true
   when: repo_packages | length > 0
 
-# Bootstrap AUR helper if needed
-- name: Bootstrap paru if no AUR helper available
-  when: aur_helper == 'none' and aur_packages | length > 0
-  block:
-    - name: Install base-devel for building AUR packages
-      community.general.pacman:
-        name: base-devel
-        state: present
-      become: true
+# Require an AUR helper for AUR packages
+- name: Fail if AUR packages needed but no helper available
+  ansible.builtin.fail:
+    msg: >-
+      AUR packages ({{ aur_packages | join(', ') }}) require an AUR helper (paru or yay)
+      but none was found. Install one first, e.g.: pacman -S paru
+  when: aur_packages | length > 0 and aur_helper == 'none'
 
-    - name: Clone paru-bin
-      ansible.builtin.git:
-        repo: https://aur.archlinux.org/paru-bin.git
-        dest: "{{ local_home }}/.cache/ansible-paru-build"
-        version: master
-        force: true
-
-    - name: Build and install paru-bin
-      ansible.builtin.command:
-        cmd: makepkg -si --noconfirm
-        chdir: "{{ local_home }}/.cache/ansible-paru-build"
-      changed_when: true
-
-    - name: Clean up paru-bin build dir
-      ansible.builtin.file:
-        path: "{{ local_home }}/.cache/ansible-paru-build"
-        state: absent
-
-    - name: Update AUR helper fact
-      ansible.builtin.set_fact:
-        aur_helper: paru
-
-# Install AUR packages (paru calls sudo internally, so we temporarily allow passwordless pacman)
-- name: Install AUR packages with temporary sudoers rule
-  when: aur_packages | length > 0
+- name: Install AUR packages
+  when: aur_packages | length > 0 and aur_helper != 'none'
   block:
     - name: Allow passwordless pacman for AUR helper
       ansible.builtin.copy:
