@@ -46,18 +46,15 @@
   delegate_to: localhost
 
 - name: Restore system configs from repo onto system
-  ansible.posix.synchronize:
+  ansible.builtin.copy:
     src: "{{ item.dest }}"
     dest: "{{ item.src }}"
-    mode: push
-    delete: false
-    rsync_opts: >-
-      {{ (['--rsync-path=sudo rsync', '--no-owner', '--no-group', '--include=*/', '-m'] + (item.includes | map('regex_replace', '^(.*)$', '--include=\1') | list) + ['--exclude=*']) | map('quote') | list }}
+    mode: preserve
   loop: "{{ config_entries | selectattr('system', 'defined') | selectattr('system') | list }}"
   loop_control:
     label: "{{ item.name }}"
   when: item.dest is exists
-  delegate_to: localhost
+  become: true
 
 # Replace @@HOME@@ placeholder with actual home path in restored files
 - name: Find restored COSMIC wallpaper config files
