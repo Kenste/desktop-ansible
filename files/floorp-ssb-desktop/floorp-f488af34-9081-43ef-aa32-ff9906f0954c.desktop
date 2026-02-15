@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ChatGPT
+Comment=ChatGPT
+Exec=/usr/lib/floorp/floorp --name floorp-f488af34-9081-43ef-aa32-ff9906f0954c --profile @@HOME@@/.floorp/79fbwj8n.default-default --start-ssb "{f488af34-9081-43ef-aa32-ff9906f0954c}"
+Icon=@@HOME@@/.local/share/icons/hicolor/512x512/apps/floorp-f488af34-9081-43ef-aa32-ff9906f0954c.svg
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+StartupWMClass=floorp-f488af34-9081-43ef-aa32-ff9906f0954c
+X-MultipleArgs=false
+X-Floorp-StartUrl=https://chatgpt.com/
+X-Floorp-Id={f488af34-9081-43ef-aa32-ff9906f0954c}
