@@ -15,9 +15,6 @@
     - role: packages
       tags: [ packages ]
 
-    - role: shell
-      tags: [ shell ]
-
     - role: services
       tags: [ services ]
 

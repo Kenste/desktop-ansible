@@ -55,6 +55,3 @@ package_groups:
     - name: intellij-idea
       arch: { repo: [ intellij-idea-community-edition ] }
 
-  shell:
-    - name: fish
-      arch: { repo: [ fish, fastfetch, eza, bat ] }
