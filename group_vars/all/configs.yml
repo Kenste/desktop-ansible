@@ -11,14 +11,6 @@ config_entries:
     dest: "{{ playbook_dir }}/files/cosmic-dconf"
     is_file: true
 
-  - name: fish
-    src: "{{ ansible_facts['env']['HOME'] }}/.config/fish/"
-    dest: "{{ playbook_dir }}/files/fish/"
-    includes:
-      - config.fish
-      - completions/***
-      - conf.d/***
-      - functions/***
 
 
   - name: vesktop
