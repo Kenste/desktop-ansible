@@ -29,11 +29,11 @@ Ansible playbook to replicate my desktop setup across fresh installs. Arch-first
 
 ### Profiles
 
-| Profile          | Groups                                                   |
-|------------------|----------------------------------------------------------|
-| `full` (default) | desktop, browser, chat, voip, gaming, development, shell |
-| `laptop`         | desktop, browser, chat, development, shell               |
-| `minimal`        | desktop, shell                                           |
+| Profile          | Groups                                         |
+|------------------|------------------------------------------------|
+| `full` (default) | desktop, browser, chat, voip, gaming, development |
+| `laptop`         | desktop, browser, chat, development            |
+| `minimal`        | desktop                                        |
 
 Pass as second argument: `./bootstrap.sh deploy laptop`, `./bootstrap.sh packages minimal`, etc.
 To add a new profile, edit `group_vars/all/settings.yml`.
@@ -42,25 +42,24 @@ To add a new profile, edit `group_vars/all/settings.yml`.
 
 ### Package Groups
 
-| Group       | Packages               | Profiles     |
-|-------------|------------------------|--------------|
-| desktop     | COSMIC DE (full suite) | all          |
-| browser     | Floorp                 | full, laptop |
-| chat        | Vesktop                | full, laptop |
-| voip        | TeamSpeak 3            | full         |
-| gaming      | Steam, Faugus Launcher | full         |
-| development | IntelliJ IDEA          | full, laptop |
-| shell       | Fish, fastfetch, eza, bat | all       |
+| Group       | Packages                          | Profiles     |
+|-------------|-----------------------------------|--------------|
+| desktop     | COSMIC DE (full suite)            | all          |
+| browser     | Floorp                            | full, laptop |
+| chat        | Vesktop                           | full, laptop |
+| voip        | TeamSpeak 3                       | full         |
+| gaming      | Steam, Prism Launcher, Faugus Launcher | full    |
+| development | IntelliJ IDEA                     | full, laptop |
 
 ### Configs
 
-Saves/restores dotfiles and app configs: COSMIC themes, Fish (including CachyOS fish config), Floorp profiles + SSB web apps,
+Saves/restores dotfiles and app configs: COSMIC themes, Floorp profiles + SSB web apps,
 Vesktop, PipeWire, JetBrains/IntelliJ, GTK, wallpapers, mimeapps. Hardcoded home paths are replaced with `@@HOME@@`
 placeholders on save and resolved on restore, so configs work across different usernames.
 
 ### System
 
-Sets Fish as default shell, enables NetworkManager/bluetooth/cosmic-greeter/pipewire services (missing services are skipped),
+Enables NetworkManager/bluetooth/cosmic-greeter/pipewire services (missing services are skipped),
 verifies COSMIC session is available. Services are enabled but not started — a reboot is required after deploy.
 
 ## Common Tasks
@@ -111,7 +110,6 @@ ansible-playbook site.yml --check --diff --ask-become-pass
 ```bash
 ansible-playbook site.yml --tags packages --ask-become-pass
 ansible-playbook site.yml --tags configs --ask-become-pass
-ansible-playbook site.yml --tags shell --ask-become-pass
 ansible-playbook site.yml --tags services --ask-become-pass
 ```
 
@@ -129,13 +127,12 @@ ansible-playbook site.yml --tags services --ask-become-pass
 group_vars/all/
   packages.yml    # what to install (per-distro mappings)
   configs.yml     # what configs to save/restore (paths + excludes)
-  settings.yml    # services, shell preference, profiles
+  settings.yml    # services, profiles
 
 roles/
   detect/         # figures out distro, user, AUR helper
   packages/       # installs packages (arch.yml, fedora.yml, debian.yml)
   configs/        # save.yml pulls configs into repo, restore.yml pushes them back
-  shell/          # sets fish as default shell
   desktop/        # verifies COSMIC is installed
   services/       # enables systemd services
 
