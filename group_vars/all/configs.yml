@@ -16,17 +16,10 @@ config_entries:
     dest: "{{ playbook_dir }}/files/fish/"
     includes:
       - config.fish
-      - fish_variables
       - completions/***
       - conf.d/***
       - functions/***
 
-  - name: cachyos-fish-config
-    src: /usr/share/cachyos-fish-config/
-    dest: "{{ playbook_dir }}/files/cachyos-fish-config/"
-    includes:
-      - "**"
-    system: true
 
   - name: vesktop
     src: "{{ ansible_facts['env']['HOME'] }}/.config/vesktop/"
